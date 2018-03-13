@@ -1,5 +1,8 @@
 require('dotenv').config();
 
+require('es6-promise').polyfill();
+require('isomorphic-fetch');
+
 /* todo require og stilla dót */
 
 /**
@@ -36,8 +39,15 @@ const departments = [
  * @returns {Promise} Promise sem mun innihalda gögn fyrir svið eða null ef það finnst ekki
  */
 async function getTests(slug) {
-  /* todo */
+
+  const response = await fetch('https://ugla.hi.is/Proftafla/View/index.php?view=proftaflaYfirlit&sid=2030&proftaflaID=37');
+  console.log('GET response status', response.status);
+  const text = await response.html();
+  console.log('GET response json', text);
 }
+
+
+
 
 /**
  * Hreinsar cache.
