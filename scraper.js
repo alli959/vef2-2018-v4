@@ -89,7 +89,19 @@ async function getTests(slug) {
     return $(this).text().trim();
   }).get().join(',');
 
-  const heading = {'heading': headers};
+  const tests = [];
+  const top = {'course':'',
+               'name':'',
+              'type':'',
+              'students':'',
+              'date':''};
+
+
+  for(let i = 1; i<=$('tr').length; i++){
+    
+    const test = await $('tbody > n ')
+  }
+
   
 
   return heading;
