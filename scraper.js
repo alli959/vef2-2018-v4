@@ -1,7 +1,27 @@
-require('dotenv').config();
+
 require('isomorphic-fetch');
 
+const util = require('util');
+
+const {promisify} = require('util');
+
 const cheerio = require('cheerio');
+
+var redis = require("redis");
+
+const client = redis.createClient({
+  url: 'redis://localhost:6379'
+});
+const setAsync =
+  util.promisify(client.set).bind(client);
+
+const getAsync = 
+  util.promisify(client.get).bind(client);
+
+
+
+
+
 
 
 
@@ -34,17 +54,12 @@ const departments = [
   },
 ];
 
-/*async function client(){
-const client = redis.createClient({
-  url: redisUrl
-});
-const setAsync =
-  promisify(client.set).bind(client);
+async function setClient(value,slug){
 
-await asyncSet('hello', 'world', 'EX', 10);
+    await setAsync(slug, JSON.stringify(value), 'EX', 7200);
 
 client.quit();
-}*/
+}
 
 
 async function get(path){
@@ -69,18 +84,38 @@ async function get(path){
 async function getTests(slug) {
   let text;
   if(slug === 'felagsvisindasvid'){
+    const cached = await getAsync(slug)
+    if (cached) {
+      return JSON.parse(cached);
+    }
     text = await get('https://ugla.hi.is/Proftafla/View/ajax.php?sid=2027&a=getProfSvids&proftaflaID=37&svidID=1&notaVinnuToflu=0');
   }
   else if(slug === 'heilbrigdisvisindasvid'){
+    const cached = await getAsync(slug)
+    if (cached) {
+      return JSON.parse(cached);
+    }
     text = await get('https://ugla.hi.is/Proftafla/View/ajax.php?sid=2027&a=getProfSvids&proftaflaID=37&svidID=2&notaVinnuToflu=0');
   }
   else if(slug === 'hugvisindasvid'){
+    const cached = await getAsync(slug)
+    if (cached) {
+      return JSON.parse(cached);
+    }
     text = await get('https://ugla.hi.is/Proftafla/View/ajax.php?sid=2027&a=getProfSvids&proftaflaID=37&svidID=3&notaVinnuToflu=0');
   }
   else if(slug === 'menntavisindasvid'){
+    const cached = await getAsync(slug)
+    if (cached) {
+      return JSON.parse(cached);
+    }
     text = await get('https://ugla.hi.is/Proftafla/View/ajax.php?sid=2027&a=getProfSvids&proftaflaID=37&svidID=4&notaVinnuToflu=0');
   }
   else if(slug === 'verkfraedi-og-natturuvisindasvid'){
+    const cached = await getAsync(slug)
+    if (cached) {
+      return JSON.parse(cached);
+    }
     text = await get('https://ugla.hi.is/Proftafla/View/ajax.php?sid=2027&a=getProfSvids&proftaflaID=37&svidID=5&notaVinnuToflu=0');
   }
 
@@ -106,10 +141,12 @@ async function getTests(slug) {
     
   }
 
+  const value = {'heading':headers,tests};
 
-  
 
-  return {'heading':headers,tests};
+  setClient(value,slug);
+
+  return value;
 
 
 }
@@ -123,7 +160,10 @@ async function getTests(slug) {
  * @returns {Promise} Promise sem mun innihalda boolean um hvort cache hafi verið hreinsað eða ekki.
  */
 async function clearCache() {
-  /* todo */
+  await client.flushall( function (err, succeeded) {
+    console.log(succeeded); 
+  });
+  return {'clear':'cleared'}
 }
 
 /**
@@ -132,7 +172,42 @@ async function clearCache() {
  * @returns {Promise} Promise sem mun innihalda object með tölfræði um próf
  */
 async function getStats() {
-  /* todo */
+    let text;
+  if(slug === 'felagsvisindasvid'){
+    const cached = await getAsync(slug)
+    if (cached) {
+      return JSON.parse(cached);
+    }
+    text = await get('https://ugla.hi.is/Proftafla/View/ajax.php?sid=2027&a=getProfSvids&proftaflaID=37&svidID=1&notaVinnuToflu=0');
+  }
+  else if(slug === 'heilbrigdisvisindasvid'){
+    const cached = await getAsync(slug)
+    if (cached) {
+      return JSON.parse(cached);
+    }
+    text = await get('https://ugla.hi.is/Proftafla/View/ajax.php?sid=2027&a=getProfSvids&proftaflaID=37&svidID=2&notaVinnuToflu=0');
+  }
+  else if(slug === 'hugvisindasvid'){
+    const cached = await getAsync(slug)
+    if (cached) {
+      return JSON.parse(cached);
+    }
+    text = await get('https://ugla.hi.is/Proftafla/View/ajax.php?sid=2027&a=getProfSvids&proftaflaID=37&svidID=3&notaVinnuToflu=0');
+  }
+  else if(slug === 'menntavisindasvid'){
+    const cached = await getAsync(slug)
+    if (cached) {
+      return JSON.parse(cached);
+    }
+    text = await get('https://ugla.hi.is/Proftafla/View/ajax.php?sid=2027&a=getProfSvids&proftaflaID=37&svidID=4&notaVinnuToflu=0');
+  }
+  else if(slug === 'verkfraedi-og-natturuvisindasvid'){
+    const cached = await getAsync(slug)
+    if (cached) {
+      return JSON.parse(cached);
+    }
+    text = await get('https://ugla.hi.is/Proftafla/View/ajax.php?sid=2027&a=getProfSvids&proftaflaID=37&svidID=5&notaVinnuToflu=0');
+  }
 }
 
 module.exports = {
