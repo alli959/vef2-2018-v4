@@ -90,21 +90,26 @@ async function getTests(slug) {
   }).get().join(',');
 
   const tests = [];
-  const top = {'course':'',
-               'name':'',
-              'type':'',
-              'students':'',
-              'date':''};
+              
 
+  for(let k = 2; k<=$('table').length; k++){
+    for(let i = 1; i<=$(`table:nth-child(${k}) > tbody > tr`).length; i++){
+        const value = {'course':  $(`.box > table:nth-child(${k}) > tbody > tr:nth-child(${i}) > td:nth-child(1)`).text(),
+                        'name':$(`.box > table:nth-child(${k}) > tbody > tr:nth-child(${i}) > td:nth-child(2)`).text(),
+                        'type':$(`.box > table:nth-child(${k}) > tbody > tr:nth-child(${i}) > td:nth-child(3)`).text(),
+                        'students':$(`.box > table:nth-child(${k}) > tbody > tr:nth-child(${i}) > td:nth-child(4)`).text(),
+                        'date':$(`.box > table:nth-child(${k}) > tbody > tr:nth-child(${i}) > td:nth-child(5)`).text()};
+      tests.push(value);
+      
+                      }
 
-  for(let i = 1; i<=$('tr').length; i++){
     
-    const test = await $('tbody > n ')
   }
+
 
   
 
-  return heading;
+  return {'heading':headers,tests};
 
 
 }
